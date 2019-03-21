@@ -1,5 +1,6 @@
 extern crate cfg_if;
 extern crate wasm_bindgen;
+extern crate js_sys;
 extern crate url;
 
 use cfg_if::cfg_if;
@@ -7,58 +8,17 @@ use wasm_bindgen::prelude::*;
 use url::{Url};
 
 mod vdom;
-
-// developer facing api 
-
-// commands to the runtime
-pub enum Cmd<TMsg> {
-    HttpCommand (TMsg)
-}
-
-pub enum Sub<TMsg> {
-    TimeSub (TMsg)
-}
-
-pub fn build_component<Model, Message>(
-    init: fn(&str) -> (Model, Option<Cmd<Message>>),
-    update: fn(&Message, &Model) -> (Option<Model>, Option<Cmd<Message>>),
-    view:  fn(&Model) -> vdom::Document,
-    subscriptions: fn(&Model) -> Option<Sub<Message>>
-) -> CobaltRuntime {
-    CobaltRuntime {}
-}
-
-// js facing api
-
-#[wasm_bindgen]
-pub struct CobaltRuntime {
-    
-}
-
-#[wasm_bindgen]
-impl CobaltRuntime {
-    
-}
-
-
-
-
-
-
-
-
-
-
+mod cobalt;
 
 
 // ----- example
 
 #[wasm_bindgen]
-pub fn render() -> CobaltRuntime {
-    build_component(init, update, view, |model| None)
+pub fn render() -> cobalt::CobaltRuntime {
+    cobalt::build_component(init, update, view, |model| None)
 }
 
-fn init(data: &str) -> (Model, Option<Cmd<Msg>>) {
+fn init(data: &str) -> (Model, Option<cobalt::Cmd<Msg>>) {
     (Model {
         title: String::from("Test"),
         slogan: String::from("test slogan")
@@ -69,7 +29,7 @@ fn view(_: &Model) -> vdom::Document {
     vdom::Document{}
 }
 
-fn update(msg: &Msg, _: &Model) -> (Option<Model>, Option<Cmd<Msg>>) {
+fn update(msg: &Msg, _: &Model) -> (Option<Model>, Option<cobalt::Cmd<Msg>>) {
     match msg {
         DataReceived => (Some(Model {
             title: String::from("Data"),
@@ -86,29 +46,6 @@ struct Model {
 enum Msg {
     DataReceived
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
